@@ -30,6 +30,10 @@
       table-layout: fixed;
     }
 
+    /* 左:右 = 約7:3 */
+    colgroup col:first-child { width: 70%; }
+    colgroup col:last-child  { width: 30%; }
+
     td {
       border: 1px solid #ccc;
       padding: 6px 6px;
@@ -43,7 +47,7 @@
     .result { background: #dbe9ff; font-weight: bold; }
 
     /* 入力ズーム防止 */
-    input, textarea {
+    input {
       font-size: 16px !important;
       width: 100%;
       box-sizing: border-box;
@@ -64,20 +68,11 @@
       flex-shrink: 0;
     }
 
-    /* コメント欄 */
-    .comment-box {
-      margin-top: 10px;
-    }
-
-    .comment-box h3 {
-      font-size: 14px;
-      margin: 6px 0;
-    }
-
-    .comment-box textarea {
-      height: 70px;
-      margin-bottom: 6px;
-      resize: vertical;
+    /* メモは完全プレーン表示（スタイルなし） */
+    .plain-memo {
+      margin-top: 8px;
+      font-size: 12px;
+      line-height: 1.5;
     }
   </style>
 </head>
@@ -86,12 +81,9 @@
 <h2>タンユン体力計算</h2>
 
 <table>
-  <!-- 列幅指定（左:右 = 約7:3 × 2セット） -->
   <colgroup>
-    <col style="width:35%">
-    <col style="width:15%">
-    <col style="width:35%">
-    <col style="width:15%">
+    <col>
+    <col>
   </colgroup>
 
   <tr>
@@ -99,11 +91,14 @@
     <td>
       <input class="input" type="time" id="currentTime" step="60">
     </td>
+  </tr>
+
+  <tr>
     <td class="fixed">現在ステージ</td>
     <td>
       <div class="stage-wrap">
         <input class="input" type="number" id="currentStage" min="1" max="10" placeholder="例:6">
-        <span>ST</span>
+        <span>ステージ</span>
       </div>
     </td>
   </tr>
@@ -111,6 +106,9 @@
   <tr>
     <td class="fixed">現在体力</td>
     <td><input class="input" type="number" id="currentStamina" placeholder="例:80"></td>
+  </tr>
+
+  <tr>
     <td class="fixed">手持ち枚数</td>
     <td><input class="input" type="number" id="ticketCount" placeholder="例:6"></td>
   </tr>
@@ -118,34 +116,29 @@
   <tr>
     <td class="fixed">回復アイテム数</td>
     <td><input class="input" type="number" id="itemCount" placeholder="例:3"></td>
-    <td class="fixed">時間回復</td>
-    <td class="fixed" id="futureRecovery">-</td>
   </tr>
 
   <tr>
-    <td class="result">獲得想定ポイント</td>
+    <td class="result">時間回復含む想定獲得ポイント数</td>
     <td class="result" id="totalPoint">-</td>
-    <td class="result">到達ステージ</td>
+  </tr>
+
+  <tr>
+    <td class="result">想定到達ステージ</td>
     <td class="result" id="clearStage">-</td>
   </tr>
 
   <tr>
-    <td class="result">到達ステージクリアに必要な体力</td>
+    <td class="result">次ステージまでに必要な体力</td>
     <td class="result" id="needStamina">-</td>
-    <td class="fixed"></td>
-    <td class="fixed"></td>
   </tr>
 </table>
 
-<!-- コメント欄 -->
-<div class="comment-box">
-  <h3>メモ・コメント</h3>
-
-  <textarea id="comment1"
-    placeholder="※ステージ9クリアポイントが不明なため情報提供ください"></textarea>
-
-  <textarea id="comment2"
-    placeholder="現在の9ステージクリアポイントは仮設定です"></textarea>
+<!-- 完全プレーンなメモ（テキストのみ） -->
+<div class="plain-memo">
+  ※ ステージ9クリアポイントが不明なため、情報提供ください。<br>
+  　 現在の9ステージクリアポイントは仮設定です。<br>
+  　 現在時刻から回復体力を出すためHP1程度の誤差があります。
 </div>
 
 <script>
@@ -188,8 +181,6 @@
     const remainMin = Math.max(0, (endDate - currentDate) / 60000);
     const futureRecovery = Math.floor(remainMin / 2);
 
-    document.getElementById("futureRecovery").textContent = futureRecovery;
-
     const currentStamina = Number(document.getElementById("currentStamina").value) || 0;
     const ticketCount = Number(document.getElementById("ticketCount").value) || 0;
     const itemCount = Number(document.getElementById("itemCount").value) || 0;
@@ -227,7 +218,7 @@
     }
 
     document.getElementById("totalPoint").textContent = totalPoint + " 点";
-    document.getElementById("clearStage").textContent = maxStage + " ST";
+    document.getElementById("clearStage").textContent = maxStage + " ステージ";
     document.getElementById("needStamina").textContent = "HP " + needStamina;
   }
 
