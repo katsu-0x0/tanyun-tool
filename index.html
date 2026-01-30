@@ -2,153 +2,204 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+
+  <!-- iPhone 入力時ズーム防止 -->
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
   <title>タンユン体力計算</title>
+
   <style>
-    body { font-family: Arial, sans-serif; }
-    table { border-collapse: collapse; }
-    td { border: 1px solid #ccc; padding: 6px 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 420px;
+      margin: 0 auto;
+      overflow-x: hidden;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    td {
+      border: 1px solid #ccc;
+      padding: 8px 10px;
+      font-size: 14px;
+    }
 
     .input { background: #ffe5cc; }
     .fixed { background: #e0e0e0; }
     .result { background: #dbe9ff; font-weight: bold; }
+
+    /* iPhone 強制ズーム対策（最重要） */
+    input, select, button {
+      font-size: 16px !important;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .stage-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stage-wrap input {
+      width: 80px;
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
-  <h2>タンユン体力計算</h2>
 
-  <table>
-    <tr>
-      <td class="fixed">現在時刻</td>
-      <td><input class="input" type="time" id="currentTime" step="60"></td>
-    </tr>
+<h2>タンユン体力計算</h2>
 
-    <tr>
-      <td class="fixed">現在ステージ</td>
-      <td>
-        <input class="input" type="number" id="currentStage" value="" style="width:60px;">
-        <span> ステージ</span>
-      </td>
-    </tr>
+<table>
+  <tr>
+    <td class="fixed">現在時刻</td>
+    <td>
+      <input class="input" type="time" id="currentTime" step="60">
+    </td>
+  </tr>
 
-    <tr>
-      <td class="fixed">現在体力</td>
-      <td><input class="input" type="number" id="currentStamina" value=""></td>
-    </tr>
+  <tr>
+    <td class="fixed">現在ステージ</td>
+    <td>
+      <div class="stage-wrap">
+        <input class="input" type="number" id="currentStage" min="1" max="10" placeholder="例: 6">
+        <span>ステージ</span>
+      </div>
+    </td>
+  </tr>
 
-    <tr>
-      <td class="fixed">手持ち枚数</td>
-      <td><input class="input" type="number" id="ticketCount" value=""></td>
-    </tr>
+  <tr>
+    <td class="fixed">現在体力</td>
+    <td><input class="input" type="number" id="currentStamina" placeholder="例: 80"></td>
+  </tr>
 
-    <tr>
-      <td class="fixed">手持ちアイテム</td>
-      <td><input class="input" type="number" id="itemCount" value=""></td>
-    </tr>
+  <tr>
+    <td class="fixed">手持ち枚数</td>
+    <td><input class="input" type="number" id="ticketCount" placeholder="例: 6"></td>
+  </tr>
 
-    <tr>
-      <td class="result">合計ポイント</td>
-      <td class="result" id="totalPoint">-</td>
-    </tr>
+  <tr>
+    <td class="fixed">手持ちアイテム</td>
+    <td><input class="input" type="number" id="itemCount" placeholder="例: 3"></td>
+  </tr>
 
-    <tr>
-      <td class="result">到達可能ステージ</td>
-      <td class="result" id="clearStage">-</td>
-    </tr>
+  <tr>
+    <td class="result">合計ポイント</td>
+    <td class="result" id="totalPoint">-</td>
+  </tr>
 
-    <tr>
-      <td class="result">次ステージまで必要体力</td>
-      <td class="result" id="needStamina">-</td>
-    </tr>
-  </table>
+  <tr>
+    <td class="result">到達可能ステージ</td>
+    <td class="result" id="clearStage">-</td>
+  </tr>
 
-  <script>
-    // ===== 裏設定 =====
-    const hiddenEndTime = "21:59";
+  <tr>
+    <td class="result">次ステージまで必要体力</td>
+    <td class="result" id="needStamina">-</td>
+  </tr>
+</table>
 
-    // ===== ステージごとのクリア必要ポイント（唯一の表）=====
-    const stageClearPointTable = {
-      1: 360,
-      2: 1440,
-      3: 2700,
-      4: 4560,
-      5: 6600,
-      6: 8880,
-      7: 11400,
-      8: 14460,
-      9: 17860,
-      10: 21860
-    };
+<script>
+  // ===== 裏設定 =====
+  const hiddenEndTime = "21:59";
 
-    function setNowTime() {
-      const now = new Date();
-      const hh = String(now.getHours()).padStart(2, "0");
-      const mm = String(now.getMinutes()).padStart(2, "0");
-      document.getElementById("currentTime").value = `${hh}:${mm}`;
+  // ===== ステージごとのクリア必要ポイント（唯一の表）=====
+  const stageClearPointTable = {
+    1: 360,
+    2: 1440,
+    3: 2700,
+    4: 4560,
+    5: 6600,
+    6: 8880,
+    7: 11400,
+    8: 14460,
+    9: 17860,
+    10: 21860
+  };
+
+  function setNowTime() {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, "0");
+    const mm = String(now.getMinutes()).padStart(2, "0");
+    document.getElementById("currentTime").value = `${hh}:${mm}`;
+  }
+
+  function calc() {
+    const now = new Date();
+
+    const timeValue = document.getElementById("currentTime").value;
+    if (!timeValue) return;
+
+    const [ch, cm] = timeValue.split(":").map(Number);
+    const currentDate = new Date(now);
+    currentDate.setHours(ch, cm, 0, 0);
+
+    const [eh, em] = hiddenEndTime.split(":").map(Number);
+    const endDate = new Date(now);
+    endDate.setHours(eh, em, 0, 0);
+
+    const remainMin = Math.max(0, (endDate - currentDate) / 60000);
+    const futureRecovery = Math.floor(remainMin / 2); // 2分で1回復
+
+    const currentStamina = Number(document.getElementById("currentStamina").value) || 0;
+    const ticketCount = Number(document.getElementById("ticketCount").value) || 0;
+    const itemCount = Number(document.getElementById("itemCount").value) || 0;
+    const currentStage = Number(document.getElementById("currentStage").value) || 1;
+
+    // ===== 合計体力（内部）=====
+    const totalStamina =
+      currentStamina +
+      futureRecovery +
+      ticketCount +
+      (itemCount * 10);
+
+    // 体力 → ポイント（体力3で60点 → 体力1で20点）
+    const staminaPoint = totalStamina * 20;
+
+    // ===== 到達可能ステージ（クリア基準）=====
+    let maxStage = currentStage;
+    for (const stage in stageClearPointTable) {
+      if (staminaPoint >= stageClearPointTable[stage]) {
+        maxStage = Number(stage);
+      }
     }
 
-    function calc() {
-      const now = new Date();
+    // ===== 合計ポイント（入場時：1つ前のステージ）=====
+    const prevStage = Math.max(0, currentStage - 1);
+    const entryBasePoint = stageClearPointTable[prevStage] || 0;
 
-      const [ch, cm] = document.getElementById("currentTime").value.split(":").map(Number);
-      const currentDate = new Date(now);
-      currentDate.setHours(ch, cm, 0, 0);
+    const totalPoint = staminaPoint + entryBasePoint;
 
-      const [eh, em] = hiddenEndTime.split(":").map(Number);
-      const endDate = new Date(now);
-      endDate.setHours(eh, em, 0, 0);
+    // ===== 次ステージまで必要体力 =====
+    const nextStage = maxStage + 1;
+    const nextClearPoint = stageClearPointTable[nextStage];
 
-      const remainMin = Math.max(0, (endDate - currentDate) / 60000);
-      const futureRecovery = Math.floor(remainMin / 2); // 2分で1回復
-
-      const currentStamina = Number(document.getElementById("currentStamina").value);
-      const ticketCount = Number(document.getElementById("ticketCount").value);
-      const itemCount = Number(document.getElementById("itemCount").value);
-      const currentStage = Number(document.getElementById("currentStage").value);
-
-      // ===== 合計体力（内部）=====
-      const totalStamina =
-        currentStamina +
-        futureRecovery +
-        ticketCount +
-        (itemCount * 10);
-
-      // 体力 → ポイント
-      const staminaPoint = totalStamina * 20;
-
-      // ===== 到達可能ステージ（クリア基準）=====
-      let maxStage = currentStage;
-      for (const stage in stageClearPointTable) {
-        if (staminaPoint >= stageClearPointTable[stage]) {
-          maxStage = Number(stage);
-        }
-      }
-
-      // ===== 合計ポイント（1つ前のステージを使用）=====
-      const prevStage = Math.max(0, currentStage - 1);
-      const entryBasePoint = stageClearPointTable[prevStage] || 0;
-
-      const totalPoint = staminaPoint + entryBasePoint;
-
-      // ===== 次ステージまで必要体力（クリア基準）=====
-      const nextStage = maxStage + 1;
-      const nextClearPoint = stageClearPointTable[nextStage];
-
-      let needStamina = "-";
-      if (nextClearPoint !== undefined) {
-        const needPoint = nextClearPoint - staminaPoint;
-        needStamina = needPoint > 0
-          ? Math.ceil(needPoint / 20)
-          : 0;
-      }
-
-      document.getElementById("totalPoint").textContent = totalPoint+ " 点";
-      document.getElementById("clearStage").textContent = maxStage + " ステージ";
-      document.getElementById("needStamina").textContent ="HP " + needStamina;
+    let needStamina = "-";
+    if (nextClearPoint !== undefined) {
+      const needPoint = nextClearPoint - staminaPoint;
+      needStamina = needPoint > 0
+        ? Math.ceil(needPoint / 20)
+        : 0;
     }
 
-    setNowTime();
-    setInterval(calc, 1000);
-    calc();
-  </script>
+    document.getElementById("totalPoint").textContent = totalPoint + " 点";
+    document.getElementById("clearStage").textContent = maxStage + " ステージ";
+    document.getElementById("needStamina").textContent = "HP " + needStamina;
+  }
+
+  setNowTime();
+  setInterval(calc, 1000);
+  calc();
+</script>
+
 </body>
 </html>
