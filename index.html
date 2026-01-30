@@ -53,6 +53,22 @@
       width: 80px;
       flex-shrink: 0;
     }
+    /* iPhone Safari の time入力はみ出し対策 */
+    input[type="time"] {
+      width: 100% !important;
+      max-width: 100% !important;
+      box-sizing: border-box;
+    }
+
+    /* 表レイアウト固定（はみ出し防止） */
+    table {
+      table-layout: fixed;
+    }
+
+    td {
+      overflow: hidden;
+    }
+
   </style>
 </head>
 <body>
@@ -88,42 +104,52 @@
   </tr>
 
   <tr>
-    <td class="fixed">手持ちアイテム</td>
+    <td class="fixed">回復アイテム数</td>
     <td><input class="input" type="number" id="itemCount" placeholder="例: 3"></td>
   </tr>
 
   <tr>
-    <td class="result">合計ポイント</td>
+    <td class="result">時間回復含む想定獲得ポイント数</td>
     <td class="result" id="totalPoint">-</td>
   </tr>
 
   <tr>
-    <td class="result">到達可能ステージ</td>
+    <td class="result">到達ステージ</td>
     <td class="result" id="clearStage">-</td>
   </tr>
 
   <tr>
-    <td class="result">次ステージまで必要体力</td>
+    <td class="result">到達ステージクリアに必要な体力</td>
     <td class="result" id="needStamina">-</td>
   </tr>
 </table>
 
 <script>
   // ===== 裏設定 =====
-  const hiddenEndTime = "21:59";
+  const hiddenEndTime = "22:00";
 
   // ===== ステージごとのクリア必要ポイント（唯一の表）=====
   const stageClearPointTable = {
-    1: 360,
-    2: 1440,
-    3: 2700,
-    4: 4560,
-    5: 6600,
-    6: 8880,
-    7: 11400,
-    8: 14460,
-    9: 17860,
-    10: 21860
+//     1: 360,
+//     2: 1440,
+//     3: 2700,
+//     4: 4560,
+//     5: 6600,
+//     6: 8880,
+//     7: 11400,
+//     8: 14460,
+//     9: 17860,
+//     10: 21860
+     1: 0,
+     2: 360,
+     3: 1440,
+     4: 2700,
+     5: 4560,
+     6: 6600,
+     7: 8880,
+     8: 11400,
+     9: 14460,
+     10: 17860
   };
 
   function setNowTime() {
