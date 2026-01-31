@@ -193,8 +193,7 @@
     const staminaPoint = totalStamina * 20;
 
     /* ===== 合計ポイント ===== */
-    const prevStage = Math.max(0, currentStage - 1);
-    const entryBasePoint = stageClearPointTable[prevStage] || 0;
+    const entryBasePoint = stageClearPointTable[currentStage] || 0;
     const totalPoint = staminaPoint + entryBasePoint + currentStagePoint;
 
     /* ===== 想定到達ステージ（totalPoint 基準）===== */
