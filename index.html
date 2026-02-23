@@ -70,6 +70,19 @@
       font-size: 12px;
       line-height: 1.5;
     }
+
+    .bottom-image {
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    .bottom-image img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+
   </style>
 </head>
 <body>
@@ -91,7 +104,7 @@
     <td class="fixed">現在ステージ</td>
     <td>
       <div class="stage-wrap">
-        <input class="input" type="number" id="currentStage" min="1" max="10" placeholder="例:6">
+        <input class="input" type="number" id="currentStage" min="1" max="12" placeholder="例:6">
         <span>ステージ</span>
       </div>
     </td>
@@ -134,13 +147,35 @@
 </table>
 
 <div class="plain-memo">
-  ※ ステージ9クリアポイントが不明なため、情報提供ください。<br>
-  　 現在の9ステージクリアポイントは仮設定です。<br>
+  ※ ステージ11クリアポイントが不明なため、情報提供ください。<br>
   　 現在時刻から回復体力を出すためHP1程度の誤差があります。
 </div>
 
+  <div class="bottom-image">
+    <img src="tanyun.png" alt="説明画像">
+  </div>
+
 <script>
   const hiddenEndTime = "22:00";
+
+
+  /* ===== Enterで次の入力へ ===== */
+  const inputs = Array.from(document.querySelectorAll("input"));
+
+  inputs.forEach((input, index) => {
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const next = inputs[index + 1];
+        if (next) {
+          next.focus();
+          next.select();
+        }
+      }
+    });
+  });
+
+
 
   const stageClearPointTable = {
     1: 0,
@@ -152,7 +187,8 @@
     7: 8880,
     8: 11400,
     9: 14460,
-    10: 17860
+    10: 17820,
+    11: 22320
   };
 
   function setNowTime() {
@@ -214,9 +250,19 @@
       needStamina = needPoint > 0 ? Math.ceil(needPoint / 20) : 0;
     }
 
-    document.getElementById("totalPoint").textContent = totalPoint + " 点";
-    document.getElementById("clearStage").textContent = maxStage + " ステージ";
-    document.getElementById("needStamina").textContent = "HP " + needStamina;
+    /* ===== stageClearPointTable最大値取得 ===== */
+const maxDefinedStage = Math.max(...Object.keys(stageClearPointTable).map(Number));
+const maxDefinedPoint = stageClearPointTable[maxDefinedStage];
+
+    if (totalPoint > maxDefinedPoint) {
+      document.getElementById("totalPoint").textContent = totalPoint + " 点";
+      document.getElementById("clearStage").textContent = maxStage + " ステージ以上";
+      document.getElementById("needStamina").textContent = "情報求む";
+    } else {
+      document.getElementById("totalPoint").textContent = totalPoint + " 点";
+      document.getElementById("clearStage").textContent = maxStage + " ステージ";
+      document.getElementById("needStamina").textContent = "HP " + needStamina;
+    }
   }
 
   setNowTime();
